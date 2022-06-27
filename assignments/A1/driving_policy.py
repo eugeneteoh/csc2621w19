@@ -27,9 +27,7 @@ class DiscreteDrivingPolicy(nn.Module):
 
         
         self.features = nn.Sequential(
-            #
-            # YOUR CODE GOES HERE
-            #
+            nn.Linear(10, 10),
             Flatten(),
         )
         

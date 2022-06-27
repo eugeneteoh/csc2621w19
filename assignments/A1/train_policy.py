@@ -25,10 +25,18 @@ def train_discrete(model, iterator, opt, args):
     # Take a step in the approximate gradient direction using the optimizer opt  
     
     for i_batch, batch in enumerate(iterator):
+        inputs = batch['image']
+        labels = batch['cmd']
 
-        #
-        # YOUR CODE GOES HERE
-        #
+        inputs = inputs.to(DEVICE)
+        labels = labels.to(DEVICE)
+
+        opt.zero_grad()
+        
+        outputs = model(inputs)
+        loss = F.cross_entropy(outputs, labels, weight=args.class_dist if args.weighted_loss else None)
+        loss.backward()
+        opt.step() 
         
         loss = loss.detach().cpu().numpy()
         loss_hist.append(loss)
@@ -122,9 +130,12 @@ def main(args):
     for epoch in range(args.n_epochs):
         print ('EPOCH ', epoch)
 
-        #
-        # YOUR CODE GOES HERE
-        #
+        train_discrete(driving_policy, training_iterator, opt, args)
+        curr_val_acc = test_discrete(driving_policy, validation_iterator, opt, args)
+
+        if curr_val_acc > best_val_accuracy:
+            best_val_accuracy = curr_val_acc
+            torch.save(driving_policy.state_dict(), args.weights_out_file)
         
         # Train the driving policy
         # Evaluate the driving policy on the validation set
