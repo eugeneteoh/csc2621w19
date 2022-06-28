@@ -25,16 +25,29 @@ class DiscreteDrivingPolicy(nn.Module):
         super().__init__()
         self.n_classes = n_classes
 
-        
+        kernel_size = 4
+        stride = 2
+        padding = 1
         self.features = nn.Sequential(
-            nn.Linear(10, 10),
+            nn.Conv2d(3, 24, kernel_size=kernel_size, stride=stride, padding=padding),
+            nn.ReLU(),
+            nn.Conv2d(24, 36, kernel_size=kernel_size, stride=stride, padding=padding),
+            nn.ReLU(),
+            nn.Conv2d(36, 48, kernel_size=kernel_size, stride=stride, padding=padding),
+            nn.ReLU(),
+            nn.Conv2d(48, 64, kernel_size=kernel_size, stride=stride, padding=padding),
+            nn.ReLU(),
             Flatten(),
         )
         
         self.classifier = nn.Sequential(
-            #
-            # YOUR CODE GOES HERE
-            #
+            nn.Linear(4096, 4096),
+            nn.ReLU(),
+            nn.Linear(4096, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, n_classes)
         )  
         
         self.apply(weights_init)
